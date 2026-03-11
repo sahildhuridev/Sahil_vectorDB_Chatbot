@@ -42,7 +42,10 @@ def generate_chat_response(session_id: str, user_message: str, collection) -> st
                 doc = results['documents'][0][i]
                 meta = results['metadatas'][0][i] if results['metadatas'] else {}
                 price = meta.get("price", "N/A")
-                retrieved_products += f"- Product: {doc} | Price: €{price}\n"
+                url = meta.get("url", "N/A")
+                img_url = meta.get("image_url", "")
+                
+                retrieved_products += f"- Product: {doc}\n  Price: €{price}\n  Link: {url}\n  Image: {img_url}\n\n"
         else:
             retrieved_products = "No relevant products found."
             
@@ -57,6 +60,12 @@ If the user asks something unrelated to products, respond EXACTLY with:
 "I can only help with products available in this store."
 
 Do not answer general knowledge questions.
+
+FORMATTING RULES:
+1. Use **bold** for product names and prices.
+2. Always provide the product link if you mention a product.
+3. If an image URL is provided, include it as an image using markdown: ![product image](url)
+4. Keep answers concise but helpful.
 
 PRODUCT DATA:
 {retrieved_products}

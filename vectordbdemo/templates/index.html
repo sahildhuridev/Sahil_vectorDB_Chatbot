@@ -1,18 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Product Search</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .product-card { transition: transform 0.2s; height: 100%; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .product-img { height: 200px; object-fit: cover; }
-        .search-container { padding: 50px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 30px; border-radius: 0 0 20px 20px; }
-        .badge-distance { font-size: 0.75rem; background-color: #e9ecef; color: #6c757d; }
-        
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .product-card {
+            transition: transform 0.2s;
+            height: 100%;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-img {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .search-container {
+            padding: 50px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-bottom: 30px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .badge-distance {
+            font-size: 0.75rem;
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+
         /* Chatbot Styles */
         #chat-widget {
             position: fixed;
@@ -20,6 +47,7 @@
             right: 20px;
             z-index: 1000;
         }
+
         #chat-button {
             width: 60px;
             height: 60px;
@@ -28,13 +56,15 @@
             color: white;
             border: none;
             font-size: 24px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             transition: transform 0.2s;
         }
+
         #chat-button:hover {
             transform: scale(1.1);
         }
+
         #chat-window {
             display: none;
             position: fixed;
@@ -44,12 +74,14 @@
             height: 500px;
             background: white;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            display: flex; /* keep it flex but use JS to toggle display between none and flex */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            /* keep it flex but use JS to toggle display between none and flex */
             flex-direction: column;
             overflow: hidden;
             z-index: 1000;
         }
+
         #chat-header {
             background: #667eea;
             color: white;
@@ -59,6 +91,7 @@
             justify-content: space-between;
             align-items: center;
         }
+
         #chat-header button {
             background: none;
             border: none;
@@ -66,6 +99,7 @@
             font-size: 20px;
             cursor: pointer;
         }
+
         #chat-messages {
             flex-grow: 1;
             padding: 15px;
@@ -75,6 +109,7 @@
             flex-direction: column;
             gap: 10px;
         }
+
         .message {
             max-width: 80%;
             padding: 10px 15px;
@@ -82,19 +117,22 @@
             font-size: 0.9rem;
             line-height: 1.4;
         }
+
         .message.assistant {
             background: white;
             color: #333;
             align-self: flex-start;
             border-bottom-left-radius: 5px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
+
         .message.user {
             background: #667eea;
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 5px;
         }
+
         #chat-input-container {
             padding: 15px;
             background: white;
@@ -102,6 +140,7 @@
             display: flex;
             gap: 10px;
         }
+
         #chat-input-container input {
             flex-grow: 1;
             padding: 10px;
@@ -109,9 +148,11 @@
             border-radius: 20px;
             outline: none;
         }
+
         #chat-input-container input:focus {
             border-color: #667eea;
         }
+
         #chat-input-container button {
             background: #667eea;
             color: white;
@@ -120,8 +161,28 @@
             border-radius: 20px;
             cursor: pointer;
         }
+
+        /* Chat image styling */
+        .message img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: block;
+        }
+
+        .message a {
+            color: #667eea;
+            text-decoration: underline;
+        }
+
+        .message.user a {
+            color: white;
+        }
     </style>
+    <!-- Marked.js for markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+
 <body>
 
     <div class="search-container text-center">
@@ -131,7 +192,9 @@
             <form action="/search" method="post" class="row justify-content-center">
                 <div class="col-md-8">
                     <div class="input-group input-group-lg">
-                        <input type="text" name="query" class="form-control" placeholder="Try: 'something for my immune system' or 'restful sleep'..." value="{{ query if query else '' }}">
+                        <input type="text" name="query" class="form-control"
+                            placeholder="Try: 'something for my immune system' or 'restful sleep'..."
+                            value="{{ query if query else '' }}">
                         <button class="btn btn-warning px-4" type="submit">Search</button>
                     </div>
                 </div>
@@ -141,50 +204,53 @@
 
     <div class="container mb-5">
         {% if query %}
-            <div class="row mb-4">
-                <div class="col">
-                    <h3>Showing results for: <span class="text-primary">"{{ query }}"</span></h3>
-                </div>
+        <div class="row mb-4">
+            <div class="col">
+                <h3>Showing results for: <span class="text-primary">"{{ query }}"</span></h3>
             </div>
+        </div>
         {% endif %}
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% if results %}
-                {% for item in results %}
-                <div class="col">
-                    <div class="card product-card">
-                        {% if item.metadata.image_url %}
-                            <img src="{{ item.metadata.image_url }}" class="card-img-top product-img" alt="{{ item.metadata.title }}">
-                        {% else %}
-                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center product-img">
-                                <span>No Image Available</span>
-                            </div>
-                        {% endif %}
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ item.metadata.title }}</h5>
-                            <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
-                                {{ item.document[:150] }}...
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <span class="h5 mb-0">€{{ item.metadata.price if item.metadata.price else '0.00' }}</span>
-                                <span class="badge badge-distance">Match Score: {{ "%.2f"|format(1 - item.distance) }}</span>
-                            </div>
-                            {% if item.metadata.url %}
-                                <a href="{{ item.metadata.url }}" target="_blank" class="btn btn-outline-primary mt-3">View Product</a>
-                            {% endif %}
+            {% for item in results %}
+            <div class="col">
+                <div class="card product-card">
+                    {% if item.metadata.image_url %}
+                    <img src="{{ item.metadata.image_url }}" class="card-img-top product-img"
+                        alt="{{ item.metadata.title }}">
+                    {% else %}
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center product-img">
+                        <span>No Image Available</span>
+                    </div>
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ item.metadata.title }}</h5>
+                        <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                            {{ item.document[:150] }}...
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="h5 mb-0">€{{ item.metadata.price if item.metadata.price else '0.00' }}</span>
+                            <span class="badge badge-distance">Match Score: {{ "%.2f"|format(1 - item.distance)
+                                }}</span>
                         </div>
+                        {% if item.metadata.url %}
+                        <a href="{{ item.metadata.url }}" target="_blank" class="btn btn-outline-primary mt-3">View
+                            Product</a>
+                        {% endif %}
                     </div>
                 </div>
-                {% endfor %}
+            </div>
+            {% endfor %}
             {% elif query %}
-                <div class="col-12 text-center py-5">
-                    <h4>No products found. Try a different search!</h4>
-                </div>
+            <div class="col-12 text-center py-5">
+                <h4>No products found. Try a different search!</h4>
+            </div>
             {% else %}
-                <!-- Initial view if no query yet -->
-                <div class="col-12 text-center py-5 text-muted">
-                    <p>Enter a query above to find the perfect products for your needs.</p>
-                </div>
+            <!-- Initial view if no query yet -->
+            <div class="col-12 text-center py-5 text-muted">
+                <p>Enter a query above to find the perfect products for your needs.</p>
+            </div>
             {% endif %}
         </div>
     </div>
@@ -202,10 +268,14 @@
     <div id="chat-window" style="display: none;">
         <div id="chat-header">
             <span>AI Product Assistant</span>
-            <button onclick="toggleChat()">&times;</button>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="clearChat()" title="Refresh Chat" style="font-size: 16px;">🔄</button>
+                <button onclick="toggleChat()">&times;</button>
+            </div>
         </div>
         <div id="chat-messages">
-            <div class="message assistant">Hello! I am your AI Product Assistant. I can help answer questions about any of the products in our store. How can I help you today?</div>
+            <div class="message assistant">Hello! I am your AI Product Assistant. I can help answer questions about any
+                of the products in our store. How can I help you today?</div>
         </div>
         <div id="chat-input-container">
             <input type="text" id="chat-input" placeholder="Ask about products..." onkeypress="handleKeyPress(event)">
@@ -226,6 +296,9 @@
             const chatWindow = document.getElementById('chat-window');
             if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
                 chatWindow.style.display = 'flex';
+                // Scroll to bottom when opening
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             } else {
                 chatWindow.style.display = 'none';
             }
@@ -237,19 +310,68 @@
             }
         }
 
-        function appendMessage(role, text) {
+        function appendMessage(role, text, doSave = true) {
             const chatMessages = document.getElementById('chat-messages');
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${role}`;
-            msgDiv.textContent = text;
+
+            // Use marked to parse markdown (safely)
+            if (typeof marked !== 'undefined') {
+                msgDiv.innerHTML = marked.parse(text);
+                // Ensure links open in new tab
+                msgDiv.querySelectorAll('a').forEach(link => {
+                    link.setAttribute('target', '_blank');
+                    link.setAttribute('rel', 'noopener noreferrer');
+                });
+            } else {
+                msgDiv.textContent = text;
+            }
+
             chatMessages.appendChild(msgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            if (doSave) {
+                saveChatHistory(role, text);
+            }
+        }
+
+        function saveChatHistory(role, text) {
+            let history = JSON.parse(localStorage.getItem('chat_history') || '[]');
+            history.push({ role, text });
+            localStorage.setItem('chat_history', JSON.stringify(history));
+        }
+
+        function loadChatHistory() {
+            const history = JSON.parse(localStorage.getItem('chat_history') || '[]');
+            // Clear default message if history exists
+            if (history.length > 0) {
+                document.getElementById('chat-messages').innerHTML = '';
+                history.forEach(msg => {
+                    appendMessage(msg.role, msg.text, false);
+                });
+            }
+        }
+
+        // Load history on startup
+        loadChatHistory();
+
+        function clearChat() {
+            if (confirm("Are you sure you want to clear the chat history?")) {
+                localStorage.removeItem('chat_history');
+                // Reset session ID to start a fresh context on backend too
+                sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                localStorage.setItem('chat_session_id', sessionId);
+
+                // Reset UI to default
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.innerHTML = '<div class="message assistant">Hello! I am your AI Product Assistant. I can help answer questions about any of the products in our store. How can I help you today?</div>';
+            }
         }
 
         async function sendMessage() {
             const inputField = document.getElementById('chat-input');
             const message = inputField.value.trim();
-            
+
             if (!message) return;
 
             // Clear input
@@ -270,7 +392,7 @@
                 });
 
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     appendMessage('assistant', data.response);
                 } else {
@@ -283,4 +405,5 @@
         }
     </script>
 </body>
+
 </html>
