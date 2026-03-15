@@ -2,7 +2,3 @@ venv/
 .env
 __pycache__/
 *.pyc
-chroma_db/
-run_project.py
-test_openrouter.py
-readme.md
