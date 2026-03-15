@@ -25,8 +25,12 @@ def run_import_script():
     """Runs the import script in the current directory."""
     print("\nStarting data import to ChromaDB...")
     try:
-        # Run import_products.py from the current directory
-        result = subprocess.run([sys.executable, "import_products.py"], capture_output=True, text=True)
+        # Get the directory of the current script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        import_script = os.path.join(script_dir, "import_products.py")
+        
+        # Run import_products.py using its full path
+        result = subprocess.run([sys.executable, import_script], capture_output=True, text=True, cwd=script_dir)
         if result.returncode == 0:
             print("✅ Data import successful!")
             print(result.stdout)
@@ -45,9 +49,11 @@ def start_flask_app():
     print("Press Ctrl+C to stop the server.")
     
     try:
-        # We use subprocess.run so it keeps the process alive
-        # Alternatively, use Popen if we need to do more in this script
-        subprocess.run([sys.executable, "app.py"])
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        app_script = os.path.join(script_dir, "app.py")
+        
+        # Run app.py using its full path and set CWD to ensure it finds its dependencies
+        subprocess.run([sys.executable, app_script], cwd=script_dir)
     except KeyboardInterrupt:
         print("\nStopping server...")
     except Exception as e:
